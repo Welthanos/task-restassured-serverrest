@@ -44,7 +44,8 @@ public class ProdutoFuncionalTest {
         .then()
             .assertThat()
                 .statusCode(200)
-                .body("quantidade", equalTo(25));
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("quantidade", equalTo(26));
     }
 
     @Test
@@ -58,6 +59,7 @@ public class ProdutoFuncionalTest {
         .then()
             .assertThat()
                 .statusCode(200)
+                .header("Content-type", "application/json; charset=utf-8")
                 .body("quantidade", equalTo(1))
                 .body("produtos[0].nome", equalTo(nome));
     }
@@ -74,7 +76,23 @@ public class ProdutoFuncionalTest {
         .then()
             .assertThat()
                 .statusCode(200)
+                .header("Content-type", "application/json; charset=utf-8")
                 .body("nome", equalTo(nome));
+    }
+
+    @Test
+    public void testTentarBuscarProdutoComIdInexistente() {
+        String id = "BJWCtEasByCQ";
+
+        given()
+                .pathParam("_id", id)
+        .when()
+                .get("/produtos/{_id}")
+        .then()
+            .assertThat()
+                .statusCode(400)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("message", equalTo("Produto não encontrado"));
     }
 
     @Test
@@ -101,6 +119,74 @@ public class ProdutoFuncionalTest {
                 .header("Content-type", "application/json; charset=utf-8")
                 .body("message", equalTo("Cadastro realizado com sucesso"))
                 .body("_id", notNullValue());
+    }
+
+    @Test
+    public void testCadastrarProdutoComNomeEmBranco() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", token)
+                .body(
+                        """
+                                 {
+                                      "nome": "",
+                                      "preco": 4550,
+                                      "descricao": "Notebook ASUS 16GB RAM 1TB SSD Windows 11",
+                                      "quantidade": 350
+                                 }
+                           """
+                )
+        .when()
+                .post("/produtos")
+        .then()
+            .assertThat()
+                .statusCode(400)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("nome", equalTo("nome não pode ficar em branco"));
+    }
+
+    @Test
+    public void testTentarCadastrarProdutoPrecoZero() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", token)
+                .body(
+                        """
+                                 {
+                                      "nome": "Notebook ASUS",
+                                      "preco": 0,
+                                      "descricao": "Notebook ASUS 16GB RAM 1TB SSD Windows 11",
+                                      "quantidade": 350
+                                 }
+                           """
+                )
+        .when()
+                .post("/produtos")
+        .then()
+            .assertThat()
+                .statusCode(400)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("preco", equalTo("preco deve ser um número positivo"));
+    }
+
+    @Test
+    public void testTentarCadastrarProdutoSemCorpo() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", token)
+        .when()
+                .post("/produtos")
+        .then()
+            .assertThat()
+                .statusCode(400)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("nome", equalTo("nome é obrigatório"))
+                .body("preco", equalTo("preco é obrigatório"))
+                .body("descricao", equalTo("descricao é obrigatório"))
+                .body("quantidade", equalTo("quantidade é obrigatório"));
     }
 
     @Test
@@ -131,6 +217,33 @@ public class ProdutoFuncionalTest {
     }
 
     @Test
+    public void testTentarAtualizarProdutoNomeJaCadastrado() {
+        String id = "e5yGEoEHS4snRpGB";
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", token)
+                .pathParam("_id", id)
+                .body(
+                        """
+                                 {
+                                      "nome": "Pizza",
+                                      "preco": 4550,
+                                      "descricao": "Notebook Dell 16GB RAM 1TB SSD Windows 11",
+                                      "quantidade": 350
+                                 }
+                           """
+                )
+        .when()
+                .put("/produtos/{_id}")
+        .then()
+            .assertThat()
+                .statusCode(400)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("message", equalTo("Já existe produto com esse nome"));
+    }
+
+    @Test
     public void testExcluirProdutoPorIdComSucesso() {
         String id = "inGSJO9uyFqeIIZN";
 
@@ -144,5 +257,21 @@ public class ProdutoFuncionalTest {
                 .statusCode(200)
                 .header("Content-type", "application/json; charset=utf-8")
                 .body("message", equalTo("Registro excluído com sucesso"));
+    }
+
+    @Test
+    public void testTentarExcluirProdutoComIdInexistente() {
+        String id = "inGSJO9uyFq";
+
+        given()
+                .header("Authorization", token)
+                .pathParam("_id", id)
+        .when()
+                .delete("/produtos/{_id}")
+        .then()
+            .assertThat()
+                .statusCode(200)
+                .header("Content-type", "application/json; charset=utf-8")
+                .body("message", equalTo("Nenhum registro excluído"));
     }
 }
