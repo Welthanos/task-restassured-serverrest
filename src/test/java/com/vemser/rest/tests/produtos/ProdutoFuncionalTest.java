@@ -43,12 +43,29 @@ public class ProdutoFuncionalTest {
                 .get("/produtos")
         .then()
             .assertThat()
-                .statusCode(200);
+                .statusCode(200)
+                .body("quantidade", equalTo(25));
+    }
+
+    @Test
+    public void testBuscarProdutoPorNomeComSucesso() {
+        String nome = "Pizza";
+
+        given()
+                .queryParam("nome", nome)
+        .when()
+                .get("/produtos")
+        .then()
+            .assertThat()
+                .statusCode(200)
+                .body("quantidade", equalTo(1))
+                .body("produtos[0].nome", equalTo(nome));
     }
 
     @Test
     public void testBuscarProdutoPorIdComSucesso() {
         String id = "BJWCtEasByCQsrEJ";
+        String nome = "Pizza";
 
         given()
                 .pathParam("_id", id)
@@ -56,7 +73,8 @@ public class ProdutoFuncionalTest {
                 .get("/produtos/{_id}")
         .then()
             .assertThat()
-                .statusCode(200);
+                .statusCode(200)
+                .body("nome", equalTo(nome));
     }
 
     @Test
