@@ -1,11 +1,21 @@
 package com.vemser.rest.tests.usuarios;
+
+import com.vemser.rest.tests.pojo.UsuarioPojo;
+import com.vemser.rest.tests.pojo.UsuarioResponse;
 import io.restassured.http.ContentType;
+import net.datafaker.Faker;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+
+import java.util.Locale;
+
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 public class UsuarioFuncionalTest {
+    private Faker faker = new Faker(new Locale("PT-BR"));
 
     @BeforeEach
     public void setUp() {
@@ -18,86 +28,114 @@ public class UsuarioFuncionalTest {
         .when()
                 .get("/usuarios")
         .then()
-            .assertThat()
+                .assertThat()
                 .statusCode(200);
     }
 
     @Test
     public void testBuscarUsuarioPorIdComSucesso() {
-        String id = "5ruot4a7kgxmn6pd";
+        String id = cadastrarUsuario().getId();
 
         given()
                 .pathParam("_id", id)
         .when()
                 .get("/usuarios/{_id}")
         .then()
-            .assertThat()
+                .assertThat()
                 .statusCode(200);
     }
 
     @Test
     public void testCadastrarUsuarioComSucesso() {
+        UsuarioPojo usuario = novoUsuario();
 
-        given()
-                .contentType(ContentType.JSON)
-                .body(
-                        """
-                                {
-                                    "nome": "Welthanos Del Lago",
-                                    "email": "thanos.lago@gmail.com",
-                                    "password": "ltYms34QDHo1zvXC",
-                                    "administrador": "false"
-                                }
-                           """
-                )
-        .when()
-                .post("/usuarios")
-        .then()
-            .assertThat()
-                .statusCode(201)
-                .header("Content-type", "application/json; charset=utf-8")
-                .body("message", equalTo("Cadastro realizado com sucesso"))
-                .body("_id", notNullValue());
+        UsuarioResponse response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(usuario)
+                .when()
+                        .post("/usuarios")
+                .then()
+                        .assertThat()
+                        .statusCode(201)
+                        .header("Content-type", "application/json; charset=utf-8")
+                        .extract().as(UsuarioResponse.class);
+
+        Assertions.assertAll("response",
+                () -> Assertions.assertEquals("Cadastro realizado com sucesso", response.getMessage()),
+                () -> Assertions.assertNotNull(response.getId())
+        );
+
+        excluirUsuario(response.getId());
     }
 
     @Test
     public void testAtualizarUsuarioComSucesso() {
-        String id = "A9o3Lq8jiykBMRdX";
+        UsuarioPojo usuarioAtualizado = novoUsuario();
+        String id = cadastrarUsuario().getId();
 
-        given()
-                .contentType(ContentType.JSON)
-                .pathParam("_id", id)
-                .body(
-                        """
-                                {
-                                    "nome": "Welthanos Del Lagos Huecos",
-                                    "email": "thanos.lago@gmail.com",
-                                    "password": "ltYms34QDHo1zvXC",
-                                    "administrador": "true"
-                                }
-                           """
-                )
-        .when()
-                .put("/usuarios/{_id}")
-        .then()
-            .assertThat()
-                .statusCode(200)
-                .header("Content-type", "application/json; charset=utf-8")
-                .body("message", equalTo("Registro alterado com sucesso"));
+        UsuarioResponse response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .pathParam("_id", id)
+                        .body(usuarioAtualizado)
+                .when()
+                        .put("/usuarios/{_id}")
+                .then()
+                        .assertThat()
+                        .statusCode(200)
+                        .header("Content-type", "application/json; charset=utf-8")
+                        .extract().as(UsuarioResponse.class);
+
+        Assertions.assertEquals("Registro alterado com sucesso", response.getMessage());
+
+        excluirUsuario(id);
     }
 
     @Test
     public void testExcluirUsuarioPorIdComSucesso() {
-        String id = "1MMr8squdTGO83YP";
+        String id = cadastrarUsuario().getId();
 
         given()
                 .pathParam("_id", id)
         .when()
                 .delete("/usuarios/{_id}")
         .then()
-            .assertThat()
+                .assertThat()
                 .statusCode(200)
                 .header("Content-type", "application/json; charset=utf-8")
                 .body("message", equalTo("Registro excluído com sucesso"));
+    }
+
+    private UsuarioPojo novoUsuario() {
+        UsuarioPojo usuario = new UsuarioPojo();
+
+        usuario.setNome(faker.name().firstName() + " " + faker.name().lastName());
+        usuario.setEmail(faker.internet().emailAddress());
+        usuario.setPassword(faker.internet().password());
+        usuario.setAdministrador(String.valueOf(faker.bool().bool()));
+
+        return usuario;
+    }
+
+    private UsuarioResponse cadastrarUsuario() {
+        UsuarioPojo usuario = novoUsuario();
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(usuario)
+                .when()
+                        .post("/usuarios")
+                .then()
+                        .extract().as(UsuarioResponse.class);
+    }
+
+    private void excluirUsuario(String id) {
+        given()
+                .pathParam("_id", id)
+        .when()
+                .delete("/usuarios/{_id}")
+        .then();
     }
 }
