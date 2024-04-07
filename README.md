@@ -1,4 +1,4 @@
-# Formação Complementar de QA | Task 01/02 - Rest Assured
+# Formação Complementar de QA | Task 06/07/08 - Rest Assured
 
 Tarefa para a aula de Rest Assured: testes para casos positivos e negativos ao consumir a API da ServerRest.
 
