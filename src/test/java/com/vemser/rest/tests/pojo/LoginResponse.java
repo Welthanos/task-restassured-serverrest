@@ -1,11 +1,8 @@
 package com.vemser.rest.tests.pojo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class UsuarioResponse {
+public class LoginResponse {
     private String message;
-    @JsonProperty("_id")
-    private String id;
+    private String authorization;
 
     public String getMessage() {
         return message;
@@ -15,19 +12,19 @@ public class UsuarioResponse {
         this.message = message;
     }
 
-    public String getId() {
-        return id;
+    public String getAuthorization() {
+        return authorization;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
     }
 
     @Override
     public String toString() {
-        return "Response{" +
+        return "LoginResponse{" +
                 "message='" + message + '\'' +
-                ", id='" + id + '\'' +
+                ", authorization='" + authorization + '\'' +
                 '}';
     }
 }
