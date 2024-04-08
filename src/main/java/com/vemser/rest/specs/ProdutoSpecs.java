@@ -6,10 +6,10 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 
-public class UsuarioSpecs {
-    private UsuarioSpecs() {}
+public class ProdutoSpecs {
+    private ProdutoSpecs() {}
 
-    public static RequestSpecification usuarioReqSpec() {
+    public static RequestSpecification produtoReqSpec() {
         return new RequestSpecBuilder()
                 .addRequestSpecification(InicialSpecs.setUp())
                 .setContentType(ContentType.JSON)
@@ -17,7 +17,7 @@ public class UsuarioSpecs {
         ;
     }
 
-    public static ResponseSpecification usuarioResSpec(Integer statusCode) {
+    public static ResponseSpecification produtoResSpec(Integer statusCode) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectHeader("Content-type", "application/json; charset=utf-8")

@@ -28,9 +28,8 @@ public class UsuarioFuncionalTest {
 
     @Test
     public void testBuscarUsuarioPorIdComSucesso() {
-        Usuario usuario = UsuarioDataFactory.criarUsuario();
 
-        usuarioClient.buscarUsuarioPorId(usuario)
+        usuarioClient.buscarUsuarioPorId(UsuarioDataFactory.criarUsuario())
             .then()
                 .spec(UsuarioSpecs.usuarioResSpec(200))
                 .body("$", allOf(

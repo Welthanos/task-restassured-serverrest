@@ -3,12 +3,15 @@ package com.vemser.rest.data.factory;
 import com.vemser.rest.client.UsuarioClient;
 import com.vemser.rest.model.Login;
 import com.vemser.rest.model.Usuario;
+import io.restassured.response.Response;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.Locale;
 
+import static io.restassured.RestAssured.given;
+
 public class LoginDataFactory {
+    private static String token;
     private static UsuarioClient usuarioClient = new UsuarioClient();
     private static Faker faker = new Faker(new Locale("PT-BR"));
 

@@ -1,7 +1,9 @@
 package com.vemser.rest.specs;
+
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+
 import static io.restassured.config.LogConfig.logConfig;
 
 public class InicialSpecs {

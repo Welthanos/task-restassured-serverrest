@@ -21,6 +21,7 @@ public class LoginSpecs {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectHeader("Content-type", "application/json; charset=utf-8")
-                .build();
+                .build()
+        ;
     }
 }

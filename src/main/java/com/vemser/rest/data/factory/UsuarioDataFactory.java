@@ -1,8 +1,8 @@
 package com.vemser.rest.data.factory;
+
 import com.vemser.rest.model.Usuario;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.Locale;
 
 public class UsuarioDataFactory {

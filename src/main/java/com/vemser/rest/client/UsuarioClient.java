@@ -20,7 +20,7 @@ public class UsuarioClient {
     }
 
     public Response buscarUsuarioPorId(Usuario usuario) {
-        String id = cadastrarUsuario(usuario).then().extract().response().jsonPath().getString("_id");
+        String id = cadastrarUsuario(usuario).jsonPath().getString("_id");
 
         return
             given()
@@ -43,7 +43,7 @@ public class UsuarioClient {
     }
 
     public Response atualizarUsuario(Usuario usuario) {
-        String id = cadastrarUsuario(usuario).then().extract().response().jsonPath().getString("_id");
+        String id = cadastrarUsuario(usuario).jsonPath().getString("_id");
 
         return
             given()
@@ -55,7 +55,7 @@ public class UsuarioClient {
         ;
     }
     public Response excluirUsuarioPorId(Usuario usuario) {
-        String id = cadastrarUsuario(usuario).then().extract().response().jsonPath().getString("_id");
+        String id = cadastrarUsuario(usuario).jsonPath().getString("_id");
 
         return
             given()
