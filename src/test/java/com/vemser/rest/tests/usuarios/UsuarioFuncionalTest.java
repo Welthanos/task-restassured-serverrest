@@ -2,11 +2,12 @@ package com.vemser.rest.tests.usuarios;
 import com.vemser.rest.client.UsuarioClient;
 import com.vemser.rest.data.factory.UsuarioDataFactory;
 import com.vemser.rest.model.Usuario;
+import com.vemser.rest.specs.UsuarioSpecs;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import java.util.Locale;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+
+import static org.hamcrest.Matchers.*;
 
 public class UsuarioFuncionalTest {
     private UsuarioClient usuarioClient = new UsuarioClient();
@@ -17,8 +18,11 @@ public class UsuarioFuncionalTest {
 
         usuarioClient.buscarUsuarios()
             .then()
-                .assertThat()
-                .statusCode(200).header("Content-type", "application/json; charset=utf-8")
+                .spec(UsuarioSpecs.usuarioResSpec(200))
+                .body("$", allOf(
+                        hasKey("quantidade"),
+                        hasKey("usuarios")
+                ))
         ;
     }
 
@@ -28,10 +32,14 @@ public class UsuarioFuncionalTest {
 
         usuarioClient.buscarUsuarioPorId(usuario)
             .then()
-                .assertThat()
-                .statusCode(200)
-                .header("Content-type", "application/json; charset=utf-8")
-                .body("nome", equalTo(usuario.getNome()))
+                .spec(UsuarioSpecs.usuarioResSpec(200))
+                .body("$", allOf(
+                        hasKey("_id"),
+                        hasKey("nome"),
+                        hasKey("email"),
+                        hasKey("password"),
+                        hasKey("administrador")
+                ))
         ;
     }
 
@@ -40,9 +48,7 @@ public class UsuarioFuncionalTest {
 
         usuarioClient.cadastrarUsuario(UsuarioDataFactory.criarUsuario())
             .then()
-                .assertThat()
-                .statusCode(201)
-                .header("Content-type", "application/json; charset=utf-8")
+                .spec(UsuarioSpecs.usuarioResSpec(201))
                 .body("message", equalTo("Cadastro realizado com sucesso"), "_id", notNullValue())
         ;
     }
@@ -52,9 +58,7 @@ public class UsuarioFuncionalTest {
 
         usuarioClient.atualizarUsuario(UsuarioDataFactory.criarUsuario())
             .then()
-                .assertThat()
-                .statusCode(200)
-                .header("Content-type", "application/json; charset=utf-8")
+                .spec(UsuarioSpecs.usuarioResSpec(200))
                 .body("message", equalTo("Registro alterado com sucesso"))
         ;
     }
@@ -64,9 +68,8 @@ public class UsuarioFuncionalTest {
 
         usuarioClient.excluirUsuarioPorId(UsuarioDataFactory.criarUsuario())
             .then()
-                .assertThat()
-                .statusCode(200)
-                .header("Content-type", "application/json; charset=utf-8")
-                .body("message", equalTo("Registro excluído com sucesso"));
+                .spec(UsuarioSpecs.usuarioResSpec(200))
+                .body("message", equalTo("Registro excluído com sucesso"))
+        ;
     }
 }
